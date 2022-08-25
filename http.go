@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/bitly/go-simplejson"
-	"github.com/kavanahuang/config"
 	"github.com/kavanahuang/log"
 	"github.com/mozillazg/request"
 	"io/ioutil"
