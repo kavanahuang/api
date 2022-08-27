@@ -1,21 +1,22 @@
 package api
 
 import (
-	"bufio"
-	"bytes"
 	"context"
-	"fmt"
 	"github.com/kataras/iris/v12/websocket"
+	"github.com/kataras/neffos"
 	"github.com/kavanahuang/log"
-	"os"
+	"github.com/kavanahuang/system"
 	"time"
 )
 
-type websocketClient struct{}
+type websocketClient struct {
+	conn   *neffos.NSConn
+	client *neffos.Client
+}
 
 var Websocket = new(websocketClient)
 
-func (w *websocketClient) New(endpoint string, namespace string, timeout time.Duration) {
+func (ws *websocketClient) New(endpoint string, namespace string, timeout time.Duration) *websocketClient {
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(timeout))
 	defer cancel()
 
@@ -24,37 +25,30 @@ func (w *websocketClient) New(endpoint string, namespace string, timeout time.Du
 	if err != nil {
 		panic(err)
 	}
-	defer client.Close()
+	ws.client = client
+	// defer client.Close()
 
 	c, err := client.Connect(ctx, namespace)
 	if err != nil {
 		panic(err)
 	}
 
-	c.Emit("chat", []byte("Hello from Go client side!"))
+	ws.conn = c
+	return ws
+}
 
-	fmt.Fprint(os.Stdout, ">> ")
-	scanner := bufio.NewScanner(os.Stdin)
-	for {
-		if !scanner.Scan() {
-			log.Logs.Error("Scanner error: ", scanner.Err())
-			return
-		}
+func (ws *websocketClient) Send(text []byte) bool {
+	return ws.conn.Emit("chat", text)
+}
 
-		text := scanner.Bytes()
-
-		if bytes.Equal(text, []byte("exit")) {
-			if err := c.Disconnect(nil); err != nil {
-				log.Logs.Error("Reply from server: error: ", err)
-			}
-			break
-		}
-
-		ok := c.Emit("chat", text)
-		if !ok {
-			break
-		}
-
-		fmt.Fprint(os.Stdout, ">> ")
+func (ws *websocketClient) Close() {
+	if err := ws.conn.Disconnect(nil); err != nil {
+		log.Logs.Error("Reply from server: error: ", err)
 	}
+}
+
+func (ws *websocketClient) Terminal() {
+	defer ws.client.Close()
+	ws.conn.Emit("chat", []byte("Hello from Go client side!"))
+	system.Terminal.Call(ws.Close, ws.Send)
 }
