@@ -23,14 +23,14 @@ func (ws *websocketClient) New(endpoint string, namespace string, timeout time.D
 	dialer := websocket.DefaultGobwasDialer
 	client, err := websocket.Dial(ctx, dialer, endpoint, Event.WebsocketEvent(namespace))
 	if err != nil {
-		panic(err)
+		logs.Fatal(err)
 	}
 	ws.client = client
 	// defer client.Close()
 
 	c, err := client.Connect(ctx, namespace)
 	if err != nil {
-		panic(err)
+		logs.Fatal(err)
 	}
 
 	ws.conn = c
