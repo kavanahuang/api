@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/kataras/iris/v12/websocket"
 	"github.com/kataras/neffos"
-	"github.com/kavanahuang/log"
+	"github.com/kavanahuang/logs"
 	"github.com/kavanahuang/system"
 	"time"
 )
@@ -43,7 +43,7 @@ func (ws *websocketClient) Send(text []byte) bool {
 
 func (ws *websocketClient) Close() {
 	if err := ws.conn.Disconnect(nil); err != nil {
-		log.Logs.Error("Reply from server: error: ", err)
+		logs.Error("Reply from server: error: ", err)
 	}
 }
 

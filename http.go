@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/bitly/go-simplejson"
-	"github.com/kavanahuang/log"
+	"github.com/kavanahuang/logs"
 	"github.com/mozillazg/request"
 	"io/ioutil"
 	"net/http"
@@ -33,25 +33,25 @@ func (c *client) Post(url string, data any) *simplejson.Json {
 	req.Client.Timeout = Timeout
 	response, err := req.Post(url)
 	if err != nil {
-		log.Logs.Error("Post error: ", err)
+		logs.Error("Post error: ", err)
 	}
 
 	defer func() {
 		err = response.Body.Close()
 		if err != nil {
-			log.Logs.Error("Response body close error: ", err)
+			logs.Error("Response body close error: ", err)
 		}
 	}()
 
 	var result *simplejson.Json
 	result, err = response.Json()
 	if err != nil {
-		log.Logs.Error("Response context error: ", err)
+		logs.Error("Response context error: ", err)
 	}
 
 	statusCode, err := result.Get("Code").Int()
 	if err != nil {
-		log.Logs.Error("Get code error: ", err)
+		logs.Error("Get code error: ", err)
 	}
 
 	if statusCode == 200 {
@@ -60,10 +60,10 @@ func (c *client) Post(url string, data any) *simplejson.Json {
 
 	msg, err := result.Get("Msg").String()
 	if err != nil {
-		log.Logs.Error("Get msg error: ", err)
+		logs.Error("Get msg error: ", err)
 	}
 
-	log.Logs.Warning("Response code: ", strconv.Itoa(statusCode)+", msg: "+msg)
+	logs.Warning("Response code: ", strconv.Itoa(statusCode)+", msg: "+msg)
 	return nil
 }
 
@@ -88,19 +88,19 @@ func (c *client) PostString(data string, stu any) (a any) {
 	req := bytes.NewBufferString(data)
 	res, err := http.Post(c.Uri, contentType, req)
 	if err != nil {
-		log.Logs.Error("Post error: ", err)
+		logs.Error("Post error: ", err)
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Logs.Error("Read body error: ", err)
+		logs.Error("Read body error: ", err)
 	}
 
 	defer func() { _ = res.Body.Close() }()
 
 	err = json.Unmarshal(body, &stu)
 	if err != nil {
-		log.Logs.Error("Unmarshal response body error: ", err)
+		logs.Error("Unmarshal response body error: ", err)
 	}
 
 	return
@@ -110,19 +110,19 @@ func (c *client) PostByte(data []byte, stu any) any {
 	req := bytes.NewBuffer(data)
 	res, err := http.Post(c.Uri, contentType, req)
 	if err != nil {
-		log.Logs.Error("Post error: ", err)
+		logs.Error("Post error: ", err)
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Logs.Error("Read body error: ", err)
+		logs.Error("Read body error: ", err)
 	}
 
 	defer func() { _ = res.Body.Close() }()
 
 	err = json.Unmarshal(body, &stu)
 	if err != nil {
-		log.Logs.Error("Unmarshal response body error: ", err)
+		logs.Error("Unmarshal response body error: ", err)
 	}
 
 	return stu
