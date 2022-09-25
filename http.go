@@ -21,6 +21,9 @@ type client struct {
 	conn   *http.Client
 	buffer *bytes.Buffer
 	Uri    string
+	code   int
+	msg    string
+	data   any
 }
 
 var Http = new(client)
@@ -126,4 +129,59 @@ func (c *client) PostByte(data []byte, stu any) any {
 	}
 
 	return stu
+}
+
+func (c *client) NewPost(uri string, data any) *client {
+	conn := new(http.Client)
+	req := request.NewRequest(conn)
+
+	req.Json = data
+	req.Client.Timeout = Timeout
+	response, err := req.Post(uri)
+	if err != nil {
+		logs.Error("Post error: ", err)
+	}
+
+	defer func() {
+		err = response.Body.Close()
+		if err != nil {
+			logs.Error("Response body close error: ", err)
+		}
+	}()
+
+	var result *simplejson.Json
+	result, err = response.Json()
+	if err != nil {
+		logs.Error("Response context error: ", err)
+	}
+
+	statusCode, err := result.Get("Code").Int()
+	if err != nil {
+		logs.Error("Get code error: ", err)
+	}
+	c.code = statusCode
+
+	if statusCode == 200 {
+		c.data = result.Get("Data")
+	}
+
+	msg, err := result.Get("Msg").String()
+	if err != nil {
+		logs.Error("Get msg error: ", err)
+	}
+	c.msg = msg
+
+	return c
+}
+
+func (c *client) GetCode() int {
+	return c.code
+}
+
+func (c *client) GetMsg() string {
+	return c.msg
+}
+
+func (c *client) GetData() any {
+	return c.data
 }
