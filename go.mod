@@ -9,6 +9,7 @@ require (
 	github.com/kavanahuang/logs v0.0.0-20220830151853-944629158da5
 	github.com/kavanahuang/system v0.0.0-20220827071043-c7c36e36a625
 	github.com/mozillazg/request v0.8.0
+	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b
 )
 
 require (
@@ -60,7 +61,6 @@ require (
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	golang.org/x/crypto v0.0.0-20220826181053-bd7e27e6170d // indirect
-	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b // indirect
 	golang.org/x/sys v0.0.0-20220825204002-c680a09ffe64 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20211116232009-f0f3c7e86c11 // indirect
